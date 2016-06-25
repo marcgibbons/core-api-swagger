@@ -2,6 +2,7 @@ import json
 from urllib.parse import urlparse
 
 from coreapi.codecs import base
+from coreapi.compat import force_bytes
 
 
 class OpenAPICodec(base.BaseCodec):
@@ -9,7 +10,7 @@ class OpenAPICodec(base.BaseCodec):
 
     def dump(self, document, **kwargs):
         converter = DocumentToSwaggerConverter(document)
-        return json.dumps(converter.convert())
+        return force_bytes(json.dumps(converter.convert()))
 
 
 class DocumentToSwaggerConverter(object):
