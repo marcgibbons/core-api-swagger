@@ -1,5 +1,6 @@
 import json
-from urllib.parse import urlparse
+
+from six.moves.urllib.parse import urlparse
 
 from coreapi.codecs import base
 from coreapi.compat import force_bytes
