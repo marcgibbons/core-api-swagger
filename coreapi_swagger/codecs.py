@@ -51,7 +51,7 @@ class DocumentToSwaggerConverter(object):
                 operation = {
                     'tags': [tag],
                     'description': link.description,
-                    'responses': {'200': {'description': 'Yes'}},
+                    'responses': {'200': {'description': ''}},  # TODO: infer
                     'parameters': self._get_parameters(link.fields)
                 }
                 paths[link.url].update({link.action: operation})
