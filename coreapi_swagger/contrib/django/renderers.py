@@ -11,7 +11,7 @@ class OpenAPIRenderer(BaseRenderer):
     charset = None
     format = 'openapi'
 
-    def render(self, data, *args, **kwargs):
+    def render(self, data, accepted_media_type=None, renderer_context=None):
         codec = OpenAPICodec()
         return codec.dump(data)
 
@@ -29,15 +29,14 @@ class SwaggerUIRenderer(BaseRenderer):
         return template.render(context)
 
     def get_context(self, renderer_context):
-        context = RequestContext(renderer_context['request'])
         path = renderer_context['request'].path
         urls = {
             'login_url': settings.LOGIN_URL,
             'logout_url': settings.LOGOUT_URL
         }
-        context.update({
+        renderer_context.update({
             key: '%s?next=%s' % (resolve_url(val), path)
             for key, val in urls.items()
         })
 
-        return context
+        return RequestContext(renderer_context['request'], renderer_context)
