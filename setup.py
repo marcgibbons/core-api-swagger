@@ -5,6 +5,7 @@ from coreapi_swagger import VERSION
 setup(
     name='coreapi_swagger',
     version=VERSION,
+    test_suite='unittest2.collector',
     url='http://www.django-rest-framework.org',
     license='BSD',
     description='Swagger for CoreAPI',
