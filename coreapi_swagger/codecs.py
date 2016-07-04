@@ -49,11 +49,13 @@ class DocumentToSwaggerConverter(object):
     def _get_paths_object(self):
         paths = {}
         for tag, object_ in self.document.data.items():
+            if not hasattr(object_, 'links'):
+                continue
+
             for link in object_.links.values():
                 if link.url not in paths:
                     paths[link.url] = {}
 
-                operation = link
                 operation = {
                     'tags': [tag],
                     'description': link.description,
