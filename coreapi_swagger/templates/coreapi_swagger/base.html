@@ -100,6 +100,7 @@
 </head>
 
 <body class="swagger-section">
+{% block header %}
 <div id='header'>
   <div class="swagger-ui-wrap">
     <a id="logo" href="http://swagger.io">swagger</a>
@@ -107,8 +108,16 @@
       <div class='input'><input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/></div>
       <div class='input'><a id="explore" href="#" data-sw-translate>Explore</a></div>
     </form>
+    {% if request.user %}
+      {{ request.user }}
+      <a href="{{ logout_url }}">Logout</a>
+    {% else %}
+      <a href="{{ login_url }}">Login</a>
+    {% endif %}
+
   </div>
 </div>
+{% endblock %}
 
 <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>
 <div id="swagger-ui-container" class="swagger-ui-wrap"></div>

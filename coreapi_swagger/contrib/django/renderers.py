@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.shortcuts import resolve_url
 from django.template import loader
 from rest_framework.renderers import BaseRenderer
 
@@ -21,5 +23,18 @@ class SwaggerUIRenderer(BaseRenderer):
     charset = 'utf-8'
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
+        self._add_auth_urls_to_context(renderer_context)
         template = loader.get_template(self.template)
-        return template.render()
+
+        return template.render(renderer_context)
+
+    def _add_auth_urls_to_context(self, renderer_context):
+        path = renderer_context['request'].path
+        urls = {
+            'login_url': settings.LOGIN_URL,
+            'logout_url': settings.LOGOUT_URL
+        }
+        renderer_context.update({
+            key: '%s?next=%s' % (resolve_url(val), path)
+            for key, val in urls.items()
+        })
