@@ -32,6 +32,12 @@ class DocumentToSwaggerConverter(object):
             'info': self._get_info_object(),
             'paths': self._get_paths_object(),
             'host': parsed_url.netloc,
+            "securityDefinitions": {  # TODO: determine auth mechanism
+                "basic": {
+                    "type": "basic",
+                    "name": "basic",
+                }
+            },
         }
 
     def _get_info_object(self):
