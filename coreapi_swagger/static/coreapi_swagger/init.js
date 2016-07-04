@@ -1,4 +1,8 @@
 $(function () {
+  hljs.configure({
+    highlightSizeThreshold: 5000
+  });
+
   // Pre load translate...
   if(window.SwaggerTranslator) {
     window.SwaggerTranslator.translate();
@@ -22,53 +26,26 @@ $(function () {
       if(window.SwaggerTranslator) {
         window.SwaggerTranslator.translate();
       }
-
-      $('pre code').each(function(i, e) {
-        hljs.highlightBlock(e)
-      });
-
-      addApiKeyAuthorization();
-      addCsrfTokenAuthorization();
+      addCsrfTokenHeaders();
     },
     onFailure: function(data) {
       log("Unable to Load SwaggerUI");
     },
     docExpansion: "none",
-    jsonEditor: true,
-    apisSorter: "alpha",
+    jsonEditor: false,
     defaultModelRendering: 'schema',
     showRequestHeaders: false
   });
 
-  function addCsrfTokenAuthorization() {
-    var csrftoken = $('[name="csrfmiddlewaretoken"]')[0].value;
-    if (!csrftoken) {
-      return;
-    }
-    window.swaggerUi.api.clientAuthorizations.add(
-      'csrfmiddlewaretoken',
-      new SwaggerClient.ApiKeyAuthorization("X-CSRFToken", csrftoken, "header")
+  window.swaggerUi.load();
+
+  function addCsrfTokenHeaders() {
+    var token = $('[name="csrfmiddlewaretoken"]')[0].value;
+    swaggerUi.api.clientAuthorizations.add(
+      'csrf_token',
+      new SwaggerClient.ApiKeyAuthorization("X-CSRFToken", token, "header")
     );
   }
-
-  function addApiKeyAuthorization(){
-    var key = encodeURIComponent($('#input_apiKey')[0].value);
-    if(key && key.trim() != "") {
-      var apiKeyAuth = new SwaggerClient.ApiKeyAuthorization("api_key", key, "query");
-      window.swaggerUi.api.clientAuthorizations.add("api_key", apiKeyAuth);
-      log("added key " + key);
-    }
-  }
-
-  $('#input_apiKey').change(addApiKeyAuthorization);
-
-  // if you have an apiKey you would like to pre-populate on the page for demonstration purposes...
-    /*
-  var apiKey = "myApiKeyXXXX123456789";
-  $('#input_apiKey').val(apiKey);
-  */
-
-  window.swaggerUi.load();
 
   function log() {
     if ('console' in window) {
