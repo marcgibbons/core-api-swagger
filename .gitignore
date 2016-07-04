@@ -12,6 +12,7 @@
 /env/
 MANIFEST
 coverage.*
+swagger-ui/
 
 !.gitignore
 !.travis.yml
