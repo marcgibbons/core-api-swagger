@@ -1,0 +1,7 @@
+[run]
+branch = True
+source = coreapi_swagger
+
+[report]
+exclude_lines =
+    pragma: no cover

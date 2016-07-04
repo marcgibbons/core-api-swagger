@@ -17,3 +17,4 @@ swagger-ui/
 !.gitignore
 !.travis.yml
 !.isort.cfg
+!.coveragerc
