@@ -32,18 +32,12 @@ class DocumentToSwaggerConverter(object):
             'info': self._get_info_object(),
             'paths': self._get_paths_object(),
             'host': parsed_url.netloc,
-            "securityDefinitions": {  # TODO: determine auth mechanism
-                "basic": {
-                    "type": "basic",
-                    "name": "basic",
-                }
-            },
         }
 
     def _get_info_object(self):
         return {
             'title': self.document.title,
-            'version': '1.0 '  # TODO: figure out how to set this req'd field
+            'version': ''  # Required by the spec
         }
 
     def _get_paths_object(self):
@@ -59,27 +53,49 @@ class DocumentToSwaggerConverter(object):
                 operation = {
                     'tags': [tag],
                     'description': link.description,
-                    'responses': {'200': {'description': ''}},  # TODO: infer
+                    'responses': self._get_responses(link.action),
                     'parameters': self._get_parameters(link.fields)
                 }
                 paths[link.url].update({link.action: operation})
 
         return paths
 
-    def _get_parameters(self, fields):
+    @classmethod
+    def _get_parameters(cls, fields):
+        """
+        Generates Swagger Parameter Item object.
+        """
         return [
             {
                 'name': field.name,
                 'required': field.required,
-                'in': self._get_parameter_in(field.location),
+                'in': cls._convert_location_to_in(field.location),
                 'description': field.description,
                 'type': 'string'
             }
             for field in fields
         ]
 
-    def _get_parameter_in(self, location):
+    @classmethod
+    def _convert_location_to_in(cls, location):
+        """
+        Translates the CoreAPI field `location` into the Swagger `in`.
+        The values are all the same with the exception of form -> formData.
+        """
         if location == 'form':
             return 'formData'
 
         return location
+
+    def _get_responses(self, action):
+        """
+        Returns minimally acceptable responses object based
+        on action / method type.
+        """
+        template = {'description': ''}
+        if action == 'post':
+            return {'201': template}
+        if action == 'delete':
+            return {'204': template}
+
+        return {'200': template}
