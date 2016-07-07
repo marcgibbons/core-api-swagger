@@ -1,6 +1,7 @@
 import uuid
 from unittest import TestCase
 
+import six
 import coreapi
 from coreapi_swagger import codecs
 
@@ -21,6 +22,36 @@ class TestGetInfoObject(TestCase):
         Ensures that the version is provided since it is a required field.
         """
         self.assertDictContainsSubset({'version': ''}, self.sut)
+
+
+class TestGetPathsObject(TestCase):
+    def setUp(self):
+        self.path = '/users'
+        self.document = coreapi.Document(
+            content={
+                'users': {
+                    'create': coreapi.Link(
+                        action='post',
+                        url=self.path
+                    ),
+                    'list': coreapi.Link(
+                        action='get',
+                        url=self.path
+                    )
+                }
+            }
+        )
+        self.sut = codecs.DocumentToSwaggerConverter(self.document) \
+            ._get_paths_object()
+
+    def test_url_is_converted_to_key(self):
+        self.assertIn(self.path, self.sut)
+
+    def test_actions_are_converted_to_keys_under_url(self):
+        expected = [
+            link.action for link in self.document.data['users'].values()
+        ]
+        six.assertCountEqual(self, expected, self.sut[self.path].keys())
 
 
 class TestGetParameters(TestCase):
@@ -69,3 +100,20 @@ class TestConvertLocationToIn(TestCase):
         """
         expected = str(uuid.uuid4())
         self.assertEqual(expected, self.sut(expected))
+
+
+class TestGetResponses(TestCase):
+    def setUp(self):
+        self.sut = codecs.DocumentToSwaggerConverter._get_responses
+
+    def test_post(self):
+        self.assertDictEqual({'201': {'description': ''}}, self.sut('post'))
+
+    def test_delete(self):
+        self.assertDictEqual({'201': {'description': ''}}, self.sut('post'))
+
+    def test_default(self):
+        self.assertDictEqual(
+            {'200': {'description': ''}},
+            self.sut(uuid.uuid4())
+        )

@@ -50,15 +50,19 @@ class DocumentToSwaggerConverter(object):
                 if link.url not in paths:
                     paths[link.url] = {}
 
-                operation = {
-                    'tags': [tag],
-                    'description': link.description,
-                    'responses': self._get_responses(link.action),
-                    'parameters': self._get_parameters(link.fields)
-                }
+                operation = self._get_operation(tag, link)
                 paths[link.url].update({link.action: operation})
 
         return paths
+
+    @classmethod
+    def _get_operation(cls, tag, link):
+        return {
+            'tags': [tag],
+            'description': link.description,
+            'responses': cls._get_responses(link.action),
+            'parameters': cls._get_parameters(link.fields)
+        }
 
     @classmethod
     def _get_parameters(cls, fields):
@@ -87,7 +91,8 @@ class DocumentToSwaggerConverter(object):
 
         return location
 
-    def _get_responses(self, action):
+    @classmethod
+    def _get_responses(cls, action):
         """
         Returns minimally acceptable responses object based
         on action / method type.
